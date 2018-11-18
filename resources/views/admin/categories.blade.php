@@ -38,7 +38,7 @@ Category Manager
                     </td>
                     <td>
                         <button type="button" class="btn btn-info category-update-btn" onClick="updateCategoryClicked.call(this)" value="{{$category->id}}">Update</button>
-                        <button type="button" class="btn btn-primary category-delete-btn" onClick="deleteCategoryClicked.call(this)" value="{{$category->id}}">Delete</button>
+                        <button type="button" class="btn btn-danger category-delete-btn" onClick="deleteCategoryClicked.call(this)" value="{{$category->id}}">Delete</button>
                     </td>
                 </tr>
             @endforeach
@@ -180,8 +180,11 @@ Category Manager
                     },
                     success: function (response) {
                         if(!response.error){
-                            sendFileToServer(name, file_data);
-                            toastr.success('Category was created!');
+                            if(!sendFileToServer(name, file_data)){
+                                toastr.error('Image Upload Failed!');
+                            }else{
+                                toastr.success('Category was created!');
+                            }
                             $("#category-name").val("");
                             $("#category-desc").val("");
                             $("#category-image-path").val("");
@@ -190,7 +193,7 @@ Category Manager
 
                             var categoryID = response.data;                           
 
-                            var htmlCreated = '<tr id="row-' + categoryID +'"><td id="name-' + categoryID + '">' + name + '</td><td id="desc-' + categoryID + '">' + desc + '</td><td id="admin-name-' + categoryID + '">' + adminName + '</td><td id="image-path-' + categoryID + '"><img src="' + imagePath +'" width="100"></td><td><button type="button" class="btn btn-info category-update-btn" onClick="updateCategoryClicked.call(this)" value="' + categoryID + '">Update</button><button type="button" class="btn btn-primary category-delete-btn" onClick="deleteCategoryClicked.call(this)" value="' + categoryID + '">Delete</button></td></tr>';
+                            var htmlCreated = '<tr id="row-' + categoryID +'"><td id="name-' + categoryID + '">' + name + '</td><td id="desc-' + categoryID + '">' + desc + '</td><td id="admin-name-' + categoryID + '">' + adminName + '</td><td id="image-path-' + categoryID + '"><img src="' + imagePath +'" width="100"></td><td><button type="button" class="btn btn-info category-update-btn" onClick="updateCategoryClicked.call(this)" value="' + categoryID + '">Update</button><button type="button" class="btn btn-danger category-delete-btn" onClick="deleteCategoryClicked.call(this)" value="' + categoryID + '">Delete</button></td></tr>';
 
                             $('#listtable tbody').prepend(htmlCreated);
                         }
@@ -230,8 +233,11 @@ Category Manager
                     },
                     success: function (response) {
                         if(!response.error){
-                            changeFileName(oldName, name);
-                            toastr.success('Category was changed!');
+                            if(!changeFileName(oldName, name)){
+                                toastr.error('Upload file failed!');
+                            }else{
+                                toastr.success('Category was changed!');
+                            }
                             $("#name-" + categoryID).html(name);
                             $("#desc-" + categoryID).html(desc);
                             $("#image-path-" + categoryID + " img").attr('src', imagePath);
@@ -260,8 +266,11 @@ Category Manager
                     },
                     success: function (response) {
                         if(!response.error){
-                            sendFileToServer(name, file_data);
-                            toastr.success('Category was changed!');
+                            if(!sendFileToServer(name, file_data)){
+                                toastr.error('Image Upload Failed!');
+                            }else{
+                                toastr.success('Category was changed!');
+                            }
                             $("#name-" + categoryID).html(name);
                             $("#desc-" + categoryID).html(desc);
                             $("#image-path-" + categoryID + " img").attr('src', imagePath);
@@ -335,16 +344,18 @@ Category Manager
                             toastr.success('Category was changed!');
                             $('#category-image-file').val('');
                         }
+                        return 1;
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
                         toastr.error(xhr.responseJSON.message);
+                        return 0;
                     }
                 });
             } else {
                 toastr.error("Not Image! Try again");
                 $('#category-image-file').val('');
+                return 0;
             }
-            return false;
         }
 
         function changeFileName(oldName, newName) {
@@ -360,9 +371,11 @@ Category Manager
                             // toastr.success('Category was changed!');
                             // $('#category-image-file').val('');
                         }
+                        return 1;
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
                         toastr.error(xhr.responseJSON.message);
+                        return 0;
                     }
                 });
         }

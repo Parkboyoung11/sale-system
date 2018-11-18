@@ -39,7 +39,7 @@ Slide Manager
                     </td>
                     <td>
                         <button type="button" class="btn btn-info slide-update-btn" onClick="updateSlideClicked.call(this)" value="{{$slide->id}}">Update</button>
-                        <button type="button" class="btn btn-primary slide-delete-btn" onClick="deleteSlideClicked.call(this)" value="{{$slide->id}}">Delete</button>
+                        <button type="button" class="btn btn-danger slide-delete-btn" onClick="deleteSlideClicked.call(this)" value="{{$slide->id}}">Delete</button>
                     </td>
                 </tr>
             @endforeach
@@ -186,14 +186,17 @@ Slide Manager
                     success: function (response) {
                         if(!response.error)
                         {
-                            sendFileToServer(title, file_data);
-                            toastr.success('Slide was created!');
+                            if(!sendFileToServer(title, file_data)){
+                                toastr.error('Image Upload Failed!');
+                            }else{
+                                toastr.success('Slide was created!');
+                            }
                             $("#slide-title").val("");
                             $("#slide-link").val("");
                             $('#slide-image-file').val('');
                             $('#slide-image-preview').hide();
                             var slideID = response.data;
-                            var htmlCreated = '<tr id="row-' + slideID +'"><td id="title-' + slideID + '">' + title + '</td><td id="link-' + slideID + '"><img src="' + link + '" alt="" width="200"></td><td><label class="switch"><input class="slide-status" onChange="changeSlideStatusClicked.call(this)" type="checkbox" checked id="' + slideID + '"><span class="slider round"></span></label></td><td><button type="button" class="btn btn-info slide-update-btn" onClick="updateSlideClicked.call(this)" value="' + slideID + '">Update</button><button type="button" class="btn btn-primary slide-delete-btn" onClick="deleteSlideClicked.call(this)" value="' + slideID + '">Delete</button></td></tr>';
+                            var htmlCreated = '<tr id="row-' + slideID +'"><td id="title-' + slideID + '">' + title + '</td><td id="link-' + slideID + '"><img src="' + link + '" alt="" width="200"></td><td><label class="switch"><input class="slide-status" onChange="changeSlideStatusClicked.call(this)" type="checkbox" checked id="' + slideID + '"><span class="slider round"></span></label></td><td><button type="button" class="btn btn-info slide-update-btn" onClick="updateSlideClicked.call(this)" value="' + slideID + '">Update</button><button type="button" class="btn btn-danger slide-delete-btn" onClick="deleteSlideClicked.call(this)" value="' + slideID + '">Delete</button></td></tr>';
                             $('#listtable tbody').prepend(htmlCreated);
                         }
                     },
@@ -226,8 +229,12 @@ Slide Manager
                     success: function (response) {
                         if(!response.error)
                         {
-                            changeFileName(oldName, title);
-                            toastr.success('Slide was changed!');
+                            if(!changeFileName(oldName, title)){
+                                toastr.error('Image Upload Failed!');
+                            }else {
+                                toastr.success('Slide was changed!');
+                            }
+                            
                             $("#title-" + slideID).html(title);
                             $("#link-" + slideID + " img").attr('src', link);
                         }
@@ -253,8 +260,11 @@ Slide Manager
                     success: function (response) {
                         if(!response.error)
                         {
-                            sendFileToServer(title, file_data);
-                            toastr.success('Slide was changed!');
+                            if(!sendFileToServer(title, file_data)){
+                                toastr.error('Image Upload Failed!');
+                            }else{
+                                toastr.success('Slide was changed!');
+                            }
                             $("#title-" + slideID).html(title);
                             $("#link-" + slideID + " img").attr('src', link);
                         }
@@ -325,16 +335,18 @@ Slide Manager
                             toastr.success('Slide was changed!');
                             $('#slide-image-file').val('');
                         }
+                        return 1;
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
                         toastr.error(xhr.responseJSON.message);
+                        return 0;
                     }
                 });
             } else {
                 toastr.error("Not Image! Try again");
                 $('#slide-image-file').val('');
+                return 0;
             }
-            return false;
         }
 
         function changeFileName(oldName, newName) {
@@ -348,9 +360,11 @@ Slide Manager
                     success: function (response) {
                         if(!response.error){
                         }
+                        return 1;
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
                         toastr.error(xhr.responseJSON.message);
+                        return 0;
                     }
                 });
         }
